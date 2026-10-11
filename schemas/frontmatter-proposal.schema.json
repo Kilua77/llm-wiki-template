@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://llm-wiki-template/schemas/frontmatter-proposal.schema.json",
+  "title": "Bundle proposal frontmatter (CHARTE §6.4)",
+  "description": "Frontmatter of proposals/YYYY-MM-DD-<slug>.md. The body sections (Motivation, Scope, Out-of-scope, Tree, Initial pages, Overlaps) are required by convention and checked at review time, not by schema.",
+  "type": "object",
+  "required": ["type", "title", "description", "status", "generated"],
+  "additionalProperties": true,
+  "properties": {
+    "type": { "const": "Bundle Proposal" },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Proposed bundle name (kebab-case directory name once validated)."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One-sentence scope of the proposed bundle."
+    },
+    "status": { "const": "draft" },
+    "generated": {
+      "type": "object",
+      "required": ["by", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "by": { "type": "string", "minLength": 1 },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
