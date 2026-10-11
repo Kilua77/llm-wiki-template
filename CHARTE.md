@@ -81,6 +81,7 @@ added here only after explicit owner validation (§10).
 <!-- inventory:start -->
 | Bundle | Scope (one sentence) | Out of scope (does NOT go here) | Status |
 |---|---|---|---|
+| `example` | The LLM wiki pattern itself — a demonstrative bundle exercising every directory type (concept, entity, reference, raw with content_sha256, log with Query-miss) | Any real knowledge — this bundle is a live format demo, removed by `tools/init.sh`; your first real bundle comes from a §10 proposal | Demonstrative (removed at init) |
 <!-- inventory:end -->
 
 ## 4. Layout and naming
