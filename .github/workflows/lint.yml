@@ -1,0 +1,71 @@
+name: lint
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    # The secrets context is not available in a step-level `if`; hoist it.
+    env:
+      HAS_DEPLOY_KEY: ${{ secrets.INDEX_DEPLOY_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # On a pull request, check out the branch tip rather than the merge
+          # commit, so the index auto-fix below has somewhere to push.
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          # An SSH deploy key, when configured, makes the auto-fix push
+          # re-trigger this workflow (a push made with GITHUB_TOKEN would not,
+          # which would leave the required check pending forever).
+          # Setup procedure: docs/SETUP.md, step B3.
+          ssh-key: ${{ secrets.INDEX_DEPLOY_KEY }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+
+      # index.md files are generated, never authored (CHARTE §4, §12.2). An agent
+      # writing through the git API cannot run the generator, so CI runs it on
+      # the pull-request branch: the PR then carries a correct index and `main`
+      # is never merged into a stale state.
+      - name: Regenerate indexes
+        id: gen
+        run: |
+          python3 tools/gen-index.py
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Indexes regenerated:"
+            git diff --name-only
+          fi
+
+      - name: Commit regenerated indexes to the pull-request branch
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && steps.gen.outputs.changed == 'true'
+          && env.HAS_DEPLOY_KEY == 'true'
+        run: |
+          git config user.name "wiki-index"
+          git config user.email "wiki-index@users.noreply.github.com"
+          git add -- '*index.md'
+          git commit -m "chore(index): regenerate" \
+                     -m "Acting-Agent: process:ci-index"
+          git push origin HEAD:"${{ github.event.pull_request.head.ref }}"
+
+      # Without the key the index change cannot be carried into the merge, and a
+      # green check would mean a stale index on `main`. Say so instead.
+      - name: Refuse a silently stale index
+        if: >-
+          github.event_name == 'pull_request'
+          && steps.gen.outputs.changed == 'true'
+          && env.HAS_DEPLOY_KEY != 'true'
+        run: |
+          echo "::error::This pull request needs index.md regenerated, but the" \
+               "INDEX_DEPLOY_KEY secret is not configured, so CI cannot commit" \
+               "it. Configure the deploy key (CHARTE §8, remote channel)."
+          exit 1
+
+      - run: python3 tools/lint.py --ci
