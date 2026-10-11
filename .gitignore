@@ -1,0 +1,3 @@
+# Local backups of edited files (convention: file.bak.YYYYMMDD_HHMMSS)
+*.bak.*
+*.bak

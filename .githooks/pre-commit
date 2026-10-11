@@ -1,0 +1,5 @@
+#!/bin/sh
+# Safety net for manual commits: regenerate indexes, restage them, lint.
+python3 tools/gen-index.py >/dev/null || exit 1
+git add bundles/*/index.md bundles/*/*/index.md 2>/dev/null || true
+python3 tools/lint.py || exit 1

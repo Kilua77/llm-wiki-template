@@ -1,0 +1,3 @@
+# Dépendances runtime des outils (gen-index.py, lint.py).
+# La CI installe pyyaml elle-même (.github/workflows/lint.yml).
+pyyaml
