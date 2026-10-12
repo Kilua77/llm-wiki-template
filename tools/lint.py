@@ -66,6 +66,13 @@ def rel(p: Path) -> str:
     return str(p.relative_to(REPO))
 
 
+def is_plain_date(v) -> bool:
+    """A YYYY-MM-DD date — and nothing else: datetime is a subclass of date
+    in Python, so an `isinstance(v, date)` check silently admits datetimes
+    (which then crash date comparisons downstream instead of failing cleanly)."""
+    return isinstance(v, date) and not isinstance(v, datetime)
+
+
 def split_frontmatter(path: Path):
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---\n"):
@@ -127,7 +134,7 @@ def check_doc(path: Path):
     if status is not None and status not in STATUSES:
         err(f"{rel(path)}: invalid status `{status}` (draft|stable|deprecated)")
     sa = fm.get("stale_after")
-    if sa is not None and not isinstance(sa, date):
+    if sa is not None and not is_plain_date(sa):
         err(f"{rel(path)}: stale_after must be a YYYY-MM-DD date")
     gen = fm.get("generated")
     if gen is not None and (not isinstance(gen, dict) or not gen.get("by")):
@@ -145,7 +152,7 @@ def check_doc(path: Path):
                 err(f"{rel(path)}: verified entries need `by`")
     rr = fm.get("routing_review")
     if rr is not None:
-        if not isinstance(rr, dict) or not rr.get("reason") or not isinstance(rr.get("since"), date):
+        if not isinstance(rr, dict) or not rr.get("reason") or not is_plain_date(rr.get("since")):
             err(f"{rel(path)}: routing_review needs `reason` and `since: YYYY-MM-DD` (CHARTE §5)")
         else:
             ROUTING_REVIEW.append((path, rr))
@@ -233,7 +240,7 @@ def check_engineering_fields(path: Path, fm: dict) -> None:
             if sb is not None and not isinstance(sb, int):
                 err(f"{rel(path)}: source_file.size_bytes must be an integer (CHARTE §13.2)")
         if (not isinstance(cv, dict) or not str(cv.get("tool") or "").strip()
-                or not isinstance(cv.get("date"), date)):
+                or not is_plain_date(cv.get("date"))):
             err(f"{rel(path)}: conversion needs `tool` and `date: YYYY-MM-DD` (CHARTE §13.2)")
 
 
@@ -548,7 +555,7 @@ def report_freshness(docs: dict) -> None:
         if (fm.get("status") or "") == "deprecated":
             continue
         sa = fm.get("stale_after")
-        if isinstance(sa, date) and sa < today:
+        if is_plain_date(sa) and sa < today:
             warn(
                 f"{rel(path)}: stale_after {sa} passed — re-verify and refresh, or deprecate (CHARTE §8.F)"
             )

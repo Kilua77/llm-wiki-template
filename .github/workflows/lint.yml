@@ -69,3 +69,18 @@ jobs:
           exit 1
 
       - run: python3 tools/lint.py --ci
+
+  # Versioned test suite (tests/run-tests.sh) — hermetic: no network, no
+  # remote, nothing written to $HOME. pandoc/poppler exercise the real docx/pdf
+  # conversion paths of tools/ingest-doc.sh; jsonschema is optional (the
+  # schema cases skip loudly when it is missing, never silently pass).
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y pandoc poppler-utils
+      - run: pip install pyyaml jsonschema
+      - run: bash tests/run-tests.sh
