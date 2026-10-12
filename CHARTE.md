@@ -5,9 +5,11 @@
 > agent skills are only on-ramps that point here. Every convention change happens HERE
 > first, in a dedicated commit — never in local skills.
 >
-> Version: template 1.0, derived from Charte v2.1 (2026-10-11) · Bundle format:
+> Version: template 2.0, derived from Charte v2.1 (2026-10-11) and template 1.0 ·
+> Bundle format:
 > [OKF v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) ·
-> Pattern: [LLM Wiki (Karpathy)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
+> Pattern: [LLM Wiki (Karpathy)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) ·
+> Audience: public (default) — see §2, *Declared audience*
 >
 > Template lineage: this charter is an instance-neutral English derivation of a
 > production charter (v2.1). Upstream and template evolve separately — see
@@ -39,13 +41,22 @@ template ships in English.
 
 ## 2. Publishability and anonymization
 
-**Absolute rule: everything that enters a bundle is deemed publishable tomorrow, as-is,
-publicly.** No restructuring should be necessary before publication. A true but
-non-anonymizable piece of information **does not go to the wiki**.
+**Absolute rule: everything that enters a bundle is deemed releasable tomorrow, as-is,
+to the wiki's declared audience.** No restructuring should be necessary before release.
+A true but non-anonymizable piece of information **does not go to the wiki**.
+
+**Declared audience.** "Releasable" means: sharable as-is, tomorrow, with the declared
+audience — the **public by default**. A professional deployment may declare a narrower
+audience in the charter header (e.g. `Audience: the company`); instance identifiers and
+internal URLs may then be judged against that audience instead of the public, at the
+owner's declaration. Two categories remain absolute regardless of audience: **secrets**
+and **personal data** never enter the wiki, in any form. The mechanics are unchanged —
+anonymize while writing, lint scan, private denylist (which then carries the
+confidential motifs of the declared audience).
 
 Forbidden in every file of `bundles/` and `proposals/`:
 
-| Category | Forbidden examples | Publishable form |
+| Category | Forbidden examples | Releasable form |
 |---|---|---|
 | Identity of the owner and private third parties | first/last name, email, accounts, handles; names of contacts, recruiters | Impersonal writing ("the operator", passive voice, or nothing). *Public* authors of sources remain cited |
 | Instance identifiers | hostname, IP, non-standard port, `/home/<user>/…` paths, machine IDs, contracted provider | "a small VPS (2 vCPU, 8 GB RAM, no GPU)" — the transferable knowledge only |
@@ -62,7 +73,7 @@ Forbidden in every file of `bundles/` and `proposals/`:
 - ❌ "Alice's capture database feeds the wiki" → ✅ "A capture inbox (e.g. a Notion
   database) can feed ingestion via webhook"
 
-**Anonymize while writing, not after.** If you hesitate about the publishability of a
+**Anonymize while writing, not after.** If you hesitate about the releasability of a
 detail: do not write it, or ask the owner.
 
 **Enforcement**: the lint (§8, operation F) scans secrets and personal motifs. The private
@@ -103,8 +114,11 @@ bundles/<name>/
   is a new dated file, never a rewrite.
 - Extra sub-directories are possible if a bundle needs them (e.g. `playbooks/`): declare
   them in the bundle proposal or via a commit explained in `log.md`.
-- No binaries (sources are converted to markdown at ingestion, large PDFs/EPUBs chapter
-  by chapter). If a binary is ever indispensable, ask the owner (git-lfs to enable).
+- Binaries never enter the repository. A binary source (DOCX, PDF, EPUB…) is ingested
+  as **converted markdown** with the original's hash and out-of-repo reference recorded
+  in the raw header (§13.5); large documents are split chapter by chapter at
+  conversion. git-lfs remains an owner-decided exception — ask before ever committing
+  a binary.
 
 ## 5. Frontmatter — field by field
 
@@ -286,7 +300,8 @@ Run in order, on every urge to write:
    true in 6 months), **reusable** (another conversation could benefit) and **non-trivial**
    (not findable in 10 s). Otherwise: conversational memory (personal-contextual), the
    owner's action system (operational), or nothing.
-2. **Is it publishable or anonymizable?** (§2). Not anonymizable → private support, STOP.
+2. **Is it releasable to the declared audience, or anonymizable to it?** (§2). Not
+   anonymizable → private support, STOP.
    Anonymizable → anonymize **now**, while writing.
 3. **Which bundle?** Consult the inventory (§3). "None fits" is judged **after reading
    the `index.md` of candidate bundles**, not from memory — the index lists titles and
@@ -398,8 +413,17 @@ to instead. Do not delete (git history does not replace readability). Log + comm
   lint lists them with their age): re-judge each against the current inventory — if a
   bundle now claims it, propose the move; if ≥ 3 pages point at the same candidate
   bundle, **open a §10 proposal**; if the attachment has become natural, propose removing
-  the marker; otherwise do nothing and say so; **`contested` pages** (§5): resolve them
-  by rotation; pages longer than ~200 lines: propose splitting; presumed duplicates
+  the marker; otherwise do nothing and say so; **`contested` pages** (§5) — resolve by
+  rotation, at most one per bundle per week: (a) reread the contradicting sources
+  **and their dates**; (b) three outcomes are possible — **reconcile** (the page
+  states each claim's conditions of validity: "X holds for A, Y for B"), **settle by
+  evidence** (one source is superseded → ingest the newer one, §8.A, and update the
+  page), or **escalate to the owner** (a contradiction of values or judgment, not of
+  fact — the owner alone arbitrates); (c) remove `contested` and log an `Update`
+  entry saying how it was resolved ("contested resolved: <how>"); (d) a page made
+  obsolete in the process is `deprecate`d. A `contested` older than ~60 days is
+  escalated by name in the weekly report. Then: pages longer than ~200 lines: propose
+  splitting; presumed duplicates
   (propose a `merge`, **never an automatic merge**), contradictions (rotating review of
   a tag cluster), stale `verified` (`generated.at` much later → remove `verified`),
   orphan pages (link them or flag them); **non-empty `git status --porcelain`**: settle
@@ -463,6 +487,19 @@ publishability-compatible (no personal names).
    redirected, `routing_review` removed, log entry in **both** bundles), or kept with an
    updated `routing_review.reason` explaining why it stays. A bundle created without
    this sweep leaves the wiki in the exact state that motivated its creation.
+6. **Bundle split — when a bundle outgrows the ~100-page threshold (§11).** The weekly
+   metrics flag a bundle at ≥ ~100 pages; the flag must appear **two weeks in a row**
+   before a proposal is filed (a one-week spike is noise). The proposal reuses §6.4
+   with one additional mandatory section, `## Split plan`: which sub-directories and
+   pages move, what stays, residual overlaps. Arbitration is the owner's — silence
+   means no, as everywhere. After validation: `tools/new-bundle.sh <child>` (the owner
+   may also choose to rename the parent instead — an owner choice, documented in the
+   proposal), then a **migration sweep**, the exact mirror of point 5: every candidate
+   page is either moved (traced operation: new path, inbound links redirected —
+   cross-bundle links use the `../../<bundle>/…` form —, log entry in **both**
+   bundles) or kept with an updated `routing_review.reason`. The inventory rows of
+   **both** parent and child are rewritten in the same commit. No script automates
+   this: like the relocation sweep, it is a judgment call, not a script.
 
 ## 11. Search
 
@@ -494,7 +531,8 @@ on this class of machine: measured at several minutes per query on CPU-only host
 4. Create a directory under `bundles/` without the validated inventory row (§10).
 5. Rewrite or delete an entry of `log.md`.
 6. Write personal data, an instance identifier, a private URL or a secret (§2) — the
-   wiki is deemed public.
+   wiki is deemed releasable to its declared audience, and secrets and personal data
+   are forbidden at any audience.
 7. Set `verified` without real verification, or `human:` without the owner's explicit
    instruction.
 8. Write into the owner's private systems (second brain, memory, config) during a wiki
@@ -505,3 +543,5 @@ on this class of machine: measured at several minutes per query on CPU-only host
     always reported).
 11. Create a page in `syntheses/` without the owner's explicit "yes", or derive a
     synthesis from another synthesis (§6.5). **Silence means no**, as for a bundle.
+12. Commit a binary under `bundles/` — ingest it instead (§13.5) so the repository
+    stays text-only.
