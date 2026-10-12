@@ -129,7 +129,7 @@
         "sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
-          "description": "sha256 of the ORIGINAL binary — the document dedup key (distinct from content_sha256, which hashes the converted body)."
+          "description": "sha256 of the ORIGINAL binary — the document dedup key (distinct from content_sha256, which hashes the converted body). Two raws sharing it under different dates are a re-ingestion (lint); same-date sharing is a chapter split (CHARTE §13.5)."
         },
         "stored_at": {
           "type": "string",

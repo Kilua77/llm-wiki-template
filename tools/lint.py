@@ -245,15 +245,16 @@ def check_engineering_fields(path: Path, fm: dict) -> None:
 
 
 def check_source_file_dedup() -> None:
-    """CHARTE §13.2 — one binary document, one raw per bundle: the same
-    source_file.sha256 in two raws of a bundle is a re-ingestion."""
+    """CHARTE §13.2 — one binary document, one ingestion: the same
+    source_file.sha256 under two different dates is a re-ingestion. Same-date
+    duplicates are the chapters of one split ingestion (§13.5) and are fine."""
     if not BUNDLES.is_dir():
         return
     for bundle in sorted(p for p in BUNDLES.iterdir() if p.is_dir()):
         rawdir = bundle / "raw"
         if not rawdir.is_dir():
             continue
-        seen: dict[str, Path] = {}
+        seen: dict[str, tuple[str, Path]] = {}
         for f in sorted(rawdir.glob("*.md")):
             fm, _ = split_frontmatter(f)
             sf = (fm or {}).get("source_file")
@@ -262,11 +263,12 @@ def check_source_file_dedup() -> None:
             h = str(sf.get("sha256") or "")
             if not h:
                 continue
-            if h in seen:
+            date = f.name[:10]  # raw files are named YYYY-MM-DD-<slug>.md
+            if h in seen and seen[h][0] != date:
                 err(f"{rel(f)}: document re-ingestion — source_file.sha256 already "
-                    f"captured by {rel(seen[h])} (CHARTE §13.2)")
-            else:
-                seen[h] = f
+                    f"captured on {seen[h][0]} by {rel(seen[h][1])} (CHARTE §13.2)")
+            elif h not in seen:
+                seen[h] = (date, f)
 
 
 def report_contested(docs: dict) -> None:
