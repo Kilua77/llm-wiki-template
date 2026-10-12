@@ -5,7 +5,9 @@ Checks, in order:
   1. bundle inventory — every dir under bundles/ must be listed in CHARTE.md
      (between the inventory markers); `_`-prefixed dirs are local sandboxes
      (warning locally, error with --ci)
-  2. OKF conformance + Charte requirements on every non-reserved .md
+  2. OKF conformance + Charte requirements on every non-reserved .md,
+     including the engineering fields of CHARTE §13.2 (code_refs, applies_to,
+     source_file/conversion)
   3. reserved files: generated index.md untouched rules, log.md shape
   4. internal markdown links resolve
   5. publishability scan (generic secret/PII patterns; plus the private
@@ -13,6 +15,9 @@ Checks, in order:
      unless --ci)
   6. index freshness (delegates to gen-index --check)
   7. orphan pages (warning only)
+  8. document re-ingestion — two raws of one bundle never share a
+     source_file.sha256 (CHARTE §13.2)
+  9. `contested` pages listed (CHARTE §8.F rotation pickup)
 
 Exit code: 1 if any error, 0 otherwise (warnings never fail the run).
 
@@ -38,6 +43,9 @@ DENYLIST = Path(os.environ.get("WIKI_DENYLIST",
 RESERVED = {"index.md", "log.md"}
 STATUSES = {"draft", "stable", "deprecated"}
 REQUIRED = ["type", "title", "description", "tags", "status", "generated", "sources"]
+
+SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
+LINES_RE = re.compile(r"^\d+(-\d+)?$")
 
 CI = "--ci" in sys.argv
 errors: list[str] = []
@@ -141,6 +149,130 @@ def check_doc(path: Path):
             err(f"{rel(path)}: routing_review needs `reason` and `since: YYYY-MM-DD` (CHARTE §5)")
         else:
             ROUTING_REVIEW.append((path, rr))
+    check_engineering_fields(path, fm)
+
+
+def bundle_root_of(path: Path):
+    """The direct child of bundles/ containing this page (None outside bundles/)."""
+    for p in path.parents:
+        if p.parent == BUNDLES:
+            return p
+    return None
+
+
+def check_engineering_fields(path: Path, fm: dict) -> None:
+    """CHARTE §13.2 — shapes and couplings of the engineering fields.
+
+    No network: the lint checks that a commit sha is well-formed, not that it
+    exists — fabrication is guarded by convention (§13.6), not by HTTP.
+    """
+    ptype = fm.get("type")
+    is_raw = ptype == "Raw Source"
+
+    cr = fm.get("code_refs")
+    if cr is not None:
+        if not isinstance(cr, list) or not cr:
+            err(f"{rel(path)}: code_refs must be a non-empty list (CHARTE §13.2)")
+            cr = []
+        for i, ref in enumerate(cr):
+            if not isinstance(ref, dict):
+                err(f"{rel(path)}: code_refs[{i}] must be a mapping (CHARTE §13.2)")
+                continue
+            if not str(ref.get("repo") or "").strip():
+                err(f"{rel(path)}: code_refs[{i}] missing `repo` — public URL or bare slug (CHARTE §13.2)")
+            if not SHA40_RE.fullmatch(str(ref.get("commit") or "")):
+                err(f"{rel(path)}: code_refs[{i}].commit must be a FULL 40-hex sha — never a branch (CHARTE §13.2)")
+            rp = str(ref.get("path") or "")
+            if not rp or rp.startswith("/") or ".." in rp.split("/"):
+                err(f"{rel(path)}: code_refs[{i}].path must be relative, no leading slash, no `..` (CHARTE §13.2)")
+            lines = ref.get("lines")
+            if lines is not None:
+                ls = str(lines)
+                if not LINES_RE.fullmatch(ls):
+                    err(f"{rel(path)}: code_refs[{i}].lines must be `start` or `start-end` (CHARTE §13.2)")
+                else:
+                    first, _, last = ls.partition("-")
+                    if last and int(first) > int(last):
+                        err(f"{rel(path)}: code_refs[{i}].lines start > end (CHARTE §13.2)")
+        if fm.get("stale_after") is None:
+            err(f"{rel(path)}: code_refs require stale_after — a pinned commit IS a version (CHARTE §13.2)")
+    if ptype == "Decision" and not cr:
+        err(f"{rel(path)}: a Decision must carry code_refs — cite the code it concerns (CHARTE §13.2)")
+
+    at = fm.get("applies_to")
+    if at is not None:
+        if not isinstance(at, list) or not at or not all(isinstance(x, str) and x for x in at):
+            err(f"{rel(path)}: applies_to must be a non-empty list of paths (CHARTE §13.2)")
+        else:
+            root = bundle_root_of(path)
+            for target in at:
+                clean = str(target).split("#")[0]
+                if root is not None and clean.startswith("/"):
+                    resolved = root / clean.lstrip("/")
+                else:
+                    resolved = path.parent / clean
+                if not resolved.resolve().exists():
+                    err(f"{rel(path)}: applies_to a page that does not exist -> {target} (CHARTE §13.2)")
+
+    sf, cv = fm.get("source_file"), fm.get("conversion")
+    if (sf is None) != (cv is None):
+        err(f"{rel(path)}: source_file and conversion are inseparable — both or neither (CHARTE §13.2)")
+    if sf is not None:
+        if not is_raw:
+            err(f"{rel(path)}: source_file/conversion are reserved to raws ingested from binary documents (CHARTE §13.2)")
+        if not isinstance(sf, dict):
+            err(f"{rel(path)}: source_file must be a mapping (CHARTE §13.2)")
+        else:
+            if not str(sf.get("name") or "").strip():
+                err(f"{rel(path)}: source_file missing `name` (CHARTE §13.2)")
+            if not re.fullmatch(r"[0-9a-f]{64}", str(sf.get("sha256") or "")):
+                err(f"{rel(path)}: source_file.sha256 must be 64 hex chars (CHARTE §13.2)")
+            if not str(sf.get("stored_at") or "").strip():
+                err(f"{rel(path)}: source_file missing `stored_at` — public URL or storage:<slug> (CHARTE §13.2)")
+            sb = sf.get("size_bytes")
+            if sb is not None and not isinstance(sb, int):
+                err(f"{rel(path)}: source_file.size_bytes must be an integer (CHARTE §13.2)")
+        if (not isinstance(cv, dict) or not str(cv.get("tool") or "").strip()
+                or not isinstance(cv.get("date"), date)):
+            err(f"{rel(path)}: conversion needs `tool` and `date: YYYY-MM-DD` (CHARTE §13.2)")
+
+
+def check_source_file_dedup() -> None:
+    """CHARTE §13.2 — one binary document, one raw per bundle: the same
+    source_file.sha256 in two raws of a bundle is a re-ingestion."""
+    if not BUNDLES.is_dir():
+        return
+    for bundle in sorted(p for p in BUNDLES.iterdir() if p.is_dir()):
+        rawdir = bundle / "raw"
+        if not rawdir.is_dir():
+            continue
+        seen: dict[str, Path] = {}
+        for f in sorted(rawdir.glob("*.md")):
+            fm, _ = split_frontmatter(f)
+            sf = (fm or {}).get("source_file")
+            if not isinstance(sf, dict):
+                continue
+            h = str(sf.get("sha256") or "")
+            if not h:
+                continue
+            if h in seen:
+                err(f"{rel(f)}: document re-ingestion — source_file.sha256 already "
+                    f"captured by {rel(seen[h])} (CHARTE §13.2)")
+            else:
+                seen[h] = f
+
+
+def report_contested(docs: dict) -> None:
+    """List `contested` pages (CHARTE §5) for the weekly rotation (§8.F).
+    The lint lists; aging and escalation belong to the weekly metrics."""
+    items = [(path, fm.get("contested")) for path, (fm, _) in docs.items()
+             if fm.get("contested")]
+    if not items:
+        return
+    notices.append(f"{len(items)} contested page(s) awaiting rotation (CHARTE §8.F):")
+    for path, c in sorted(items, key=lambda t: str(t[0])):
+        why = f" — {c}" if isinstance(c, str) and c else ""
+        notices.append(f"  {rel(path)}{why}")
 
 
 def check_reserved(path: Path, bundle_root: Path):
@@ -489,6 +621,8 @@ def main() -> int:
     check_publishability()
     check_indexes()
     check_orphans()
+    check_source_file_dedup()
+    report_contested(docs)
     report_routing_review()
     report_freshness(docs)
 

@@ -2,14 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://llm-wiki-template/schemas/frontmatter-page.schema.json",
   "title": "Wiki page frontmatter (OKF v0.2 + CHARTE §5)",
-  "description": "Machine-readable counterpart of the CHARTE §5 field table, for pre-flight validation by agents that prepare pages outside the repository. Authority rule: CHARTE.md and tools/lint.py are authoritative; this schema follows. Rules that JSON Schema cannot express are noted per field and enforced by the lint: `verified` must NEVER be set at page creation; `covers` is forbidden outside syntheses; no page may cite a synthesis in `sources`; a synthesis at status `stable` requires a `verified` entry with a `human:` actor; internal `covers` targets must exist and be linked in the body.",
+  "description": "Machine-readable counterpart of the CHARTE §5 field table, for pre-flight validation by agents that prepare pages outside the repository. Authority rule: CHARTE.md and tools/lint.py are authoritative; this schema follows. Rules that JSON Schema cannot express are noted per field and enforced by the lint: `verified` must NEVER be set at page creation; `covers` is forbidden outside syntheses; no page may cite a synthesis in `sources`; a synthesis at status `stable` requires a `verified` entry with a `human:` actor; internal `covers` targets must exist and be linked in the body; a page carrying `code_refs` must carry `stale_after`; `source_file`/`conversion` are reserved to raws ingested from binary documents and always appear together; `applies_to` targets must exist.",
   "type": "object",
   "required": ["type", "title", "description", "tags", "status", "generated", "sources"],
   "additionalProperties": true,
   "properties": {
     "type": {
       "description": "The only field OKF itself requires.",
-      "enum": ["Concept", "Tool", "Service", "Practice", "Person", "Organization", "Synthesis", "Reference", "Playbook", "Raw Source"]
+      "enum": ["Concept", "Tool", "Service", "Practice", "Person", "Organization", "Synthesis", "Reference", "Playbook", "Raw Source", "Decision", "Constraint"]
     },
     "title": {
       "type": "string",
@@ -99,6 +99,68 @@
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },
+    "code_refs": {
+      "description": "References to code (CHARTE §13.2). REQUIRED on type: Decision. A page carrying code_refs MUST also carry stale_after — a pinned commit IS a version (the lint enforces the coupling). Never fabricate an entry: a sha you have not seen does not get written.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/code_ref" }
+    },
+    "applies_to": {
+      "description": "The system areas a piece of knowledge is about, as bundle-relative paths (CHARTE §13.2). Plain link — existence checked by the lint, no derivation coupling (that is `covers`). Recommended on Decision/Constraint.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "\\.md$",
+        "examples": ["/entities/raft-library.md", "/concepts/consensus-layer.md"]
+      }
+    },
+    "source_file": {
+      "description": "Provenance of a raw ingested from a binary document (CHARTE §13.2/§13.5). RESERVED to such raws — forbidden on every other type; always appears together with `conversion` (the lint enforces both rules). Its sha256 hashes the ORIGINAL binary and is the document-level dedup key.",
+      "type": "object",
+      "required": ["name", "sha256", "stored_at"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Basename of the original binary, e.g. system-spec-v3.docx."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "sha256 of the ORIGINAL binary — the document dedup key (distinct from content_sha256, which hashes the converted body)."
+        },
+        "stored_at": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Public URL of the original, or a non-identifying storage slug like \"storage:project-docs\"."
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Optional size of the original binary."
+        }
+      }
+    },
+    "conversion": {
+      "description": "How a binary document was converted to markdown (CHARTE §13.2). RESERVED to document-ingested raws, inseparable from `source_file`.",
+      "type": "object",
+      "required": ["tool", "date"],
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Converter and version, e.g. \"pdftotext 24.04.0 (poppler)\"."
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "When the conversion ran."
+        }
+      }
+    },
     "sources": {
       "type": "array",
       "minItems": 1,
@@ -137,9 +199,50 @@
         "required": ["covers"],
         "description": "A synthesis must declare the pages it derives from."
       }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "Decision" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["code_refs"],
+        "description": "A Decision cites the code it concerns (CHARTE §13.2)."
+      }
     }
   ],
   "$defs": {
+    "code_ref": {
+      "type": "object",
+      "required": ["repo", "commit", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Public canonical URL, or a bare slug for a local repository without a forge (wiki and code repositories are decoupled, CHARTE §13.6)."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "FULL 40-hex sha — never a branch, never an abbreviation."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "POSIX-relative path, no leading slash, no `..`."
+        },
+        "lines": {
+          "type": "string",
+          "pattern": "^\\d+(-\\d+)?$",
+          "description": "Optional: \"start-end\" or \"start\", start ≤ end."
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional, one clause."
+        }
+      }
+    },
     "verification": {
       "type": "object",
       "required": ["by", "at"],
