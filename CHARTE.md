@@ -523,7 +523,8 @@ to instead. Do not delete (git history does not replace readability). Log + comm
   a tag cluster), stale `verified` (`generated.at` much later → remove `verified`),
   orphan pages (link them or flag them); **non-empty `git status --porcelain`**: settle
   or document (WIP rule, §8 preamble). At the end of the report, a **metrics block**
-  (greps over the `log.md`s — the repository's minimal telemetry): this week's actions
+  (produced by `tools/metrics.py`, which automates the greps over the `log.md`s —
+  the repository's minimal telemetry): this week's actions
   per bundle, the week's `Query-miss` (the gaps), pages per bundle **against the ~100
   threshold of §11**, pages never cited in any log entry (dead weight). Report to the
   owner + log (`Lint`).
