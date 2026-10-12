@@ -719,8 +719,9 @@ conversion:
 
 `source_file.sha256` hashes the **binary** — the document-level dedup key (§6.3);
 `content_sha256` keeps hashing the **converted body**. Both are required on a
-document raw. Two raws in the same bundle carrying the same `source_file.sha256` is
-a lint error (re-ingestion).
+document raw. The same `source_file.sha256` under **two different dates** is a lint
+error (re-ingestion); same-date duplicates are the chapters of one split ingestion
+(§13.5) and are fine.
 
 ### 13.3 What the wiki never captures (engineering edition)
 

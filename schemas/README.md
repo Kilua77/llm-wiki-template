@@ -22,7 +22,7 @@ frontmatter you are about to write:
    cited as a source, synthesis targets linked in the body, kebab-case tags, public URLs
    only, a page carrying `code_refs` must carry `stale_after`, `source_file`/`conversion`
    reserved to document-ingested raws and always together, `applies_to` targets must
-   exist, no two raws of a bundle sharing one `source_file.sha256`. `tools/lint.py`
+   exist, no two raws sharing one `source_file.sha256` under different dates. `tools/lint.py`
    enforces all of these at commit time; the schema is the pre-flight, the lint is
    the gate.
 

@@ -172,14 +172,23 @@ PY
   regen "$sb"
 }
 
-rm -f "$B/concepts/dec.md"; regen "$sb"
+rm -f "$B/concepts/dec.md" "$B/concepts/base.md"; regen "$sb"
 mkr doc-a
-mkr doc-b
+# same-date same-hash = one split ingestion's chapters: tolerated
+sed 's/2026-10-13-doc-a/2026-10-13-doc-b/; s/Raw doc-a/Raw doc-b/' \
+  "$B/raw/2026-10-13-doc-a.md" > "$B/raw/2026-10-13-doc-b.md"
+regen "$sb"
 run_lint "$sb"
-lint_dirty "same source_file.sha256 in two raws rejected (re-ingestion)"
+lint_clean "same-date same source_file.sha256 tolerated (chapter split)"
+# different-date same-hash = re-ingestion: rejected
+sed 's/2026-10-13-doc-a/2026-10-11-doc-c/; s/Raw doc-a/Raw doc-c/' \
+  "$B/raw/2026-10-13-doc-a.md" > "$B/raw/2026-10-11-doc-c.md"
+regen "$sb"
+run_lint "$sb"
+lint_dirty "same source_file.sha256 under another date rejected (re-ingestion)"
 out_has "document re-ingestion" "…with the dedup message"
 
-rm -f "$B/raw/2026-10-13-doc-b.md"; regen "$sb"
+rm -f "$B/raw/2026-10-13-doc-b.md" "$B/raw/2026-10-11-doc-c.md"; regen "$sb"
 mkr doc-c skip
 run_lint "$sb"
 lint_dirty "raw with source_file but no conversion rejected"
