@@ -10,6 +10,9 @@ Acting-Agent: <actor>
 
 - Subject: `wiki(<bundle>): <action> — <object>` — e.g.
   `wiki(knowledge-management): ingest — Karpathy LLM wiki gist`.
+- A bundle split (CHARTE §10.6) commits under the **child** bundle's name; the pages
+  moved log as `Update` ("moved to … following bundle split") in **both** bundles'
+  `log.md`s — the action vocabulary stays closed.
 - The `Acting-Agent:` trailer is **mandatory**; it carries technical provenance where the
   frontmatter carries business provenance (`generated`, `verified`, `sources`).
 - Non-bundle work (tooling, charter, index regeneration) uses conventional prefixes:

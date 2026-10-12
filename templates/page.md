@@ -6,6 +6,9 @@ tags: [<kebab-case-tags>]
 status: stable
 stale_after: <YYYY-MM-DD>          # only when the knowledge is dated
 generated: { by: <agent>/<model>, at: <ISO-8601> }
+# Engineering fields (CHARTE §13.2), all optional except code_refs on a Decision:
+# code_refs:      [{repo, commit (40-hex), path, lines?, note?}]  → stale_after becomes required
+# applies_to:     [/bundle-relative/paths.md]                     → existence checked
 sources:
   - id: <stable-slug>
     resource: <public URL>

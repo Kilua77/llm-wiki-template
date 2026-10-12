@@ -139,6 +139,10 @@ schemas and templates change in the same commit.
 | `covers` | **Required on a synthesis** (§6.5), forbidden elsewhere | List of bundle-relative paths to the pages the synthesis derives from. The lint checks their existence, their linkage in the body, the absence of a synthesis among them, and that the synthesis is not behind their `generated.at` |
 | `routing_review` | Required if the page was **parked in the closest fit** (§7.3) | `{ reason: <one sentence>, candidate: <suspected bundle, or omitted>, since: YYYY-MM-DD }`. Marks a page whose current bundle is a best fit, not a right fit. The lint lists them on every run; the weekly lint (§8.F) and every new-bundle validation (§10) re-judge them. It is removed — the log entry says so — as soon as the page is relocated or the attachment becomes final |
 | `contested` | Optional — open contradiction | `true`, or a short sentence describing the between-sources contradiction affecting the core of the page (generalizes §7.5 when *Open questions* is not enough to flag it). The weekly lint (§8.F) lists `contested` pages and resolves them by rotation; it is removed as soon as the contradiction is settled (pages updated, or `deprecated`) |
+| `code_refs` | **Required on `type: Decision`** (§13), optional elsewhere | List of code references `{repo, commit, path, lines?, note?}` — full grammar §13.2. A page carrying `code_refs` MUST also carry `stale_after`: a pinned commit IS a version |
+| `applies_to` | Optional (recommended on Decision/Constraint) | List of bundle-relative paths to the system areas the knowledge is about — same path grammar as `covers`, but a plain link with **no** derivation coupling: only existence is checked. Not a duplicate of `covers`, not `affects` |
+| `source_file` | Required on a raw ingested from a **binary document**, forbidden elsewhere | `{name, sha256, stored_at, size_bytes?}` — the ORIGINAL binary's hash (the dedup key for documents) and its out-of-repo location. Always appears together with `conversion` (§13.2) |
+| `conversion` | Same rule as `source_file` — the pair is inseparable | `{tool, date}` — what converted the binary to markdown, and when. Records the conversion chain so a later re-ingestion can reproduce it |
 | `sources` | Required (≥1) | List: `{ id: <stable-slug>, resource: <PUBLIC URL>, title, author, last_modified }`. `resource` required per entry. Direct observation without a public URL: `{ id: observation, resource: "observation:<YYYY-MM>", title: "Direct observation" }` — never a private URL (§2) |
 
 Classic mistakes to avoid: frontmatter without its closing dashes; `stale_after` as a
@@ -207,6 +211,24 @@ being immutable, it is never recomputed. Before ingesting a URL, the agent compa
 hash of the freshly fetched content against the `content_sha256` of existing raws for the
 same URL: identical → the source has not changed, no need to re-ingest (at most update the
 reference's `last_modified`); different → new dated file, never a rewrite.
+
+**Raw ingested from a binary document** (DOCX, PDF, EPUB… — §13.5): the header gains
+the inseparable pair `source_file` / `conversion` (required, §13.2, and forbidden on
+every other type):
+
+```yaml
+source_file:
+  name: <basename of the original binary>
+  sha256: <sha256 of the ORIGINAL binary — the document dedup key>
+  stored_at: <public URL of the original, or "storage:<slug>">
+conversion:
+  tool: "<converter and version, e.g. 'pdftotext 24.04.0 (poppler)'>"
+  date: YYYY-MM-DD
+```
+
+Deduplication for documents uses the **binary's** hash, mirroring the `content_sha256`
+rule: before ingesting a document, compare its sha256 against the `source_file.sha256`
+of existing raws — identical → do not re-ingest; different → new dated file.
 
 ### 6.4 Bundle proposal (`proposals/YYYY-MM-DD-<slug>.md`)
 
@@ -292,6 +314,77 @@ Body: the summary of a covered page reuses its **lead summary**, not its detail.
 synthesis **augments** the pages, it does not replace them: every claim remains
 verifiable in the covered page, which keeps its citations.
 
+### 6.6 Decision (`concepts/`, engineering — §13)
+
+An architecture decision in the ADR sense: context, choice, consequences.
+
+```markdown
+---
+type: Decision
+title: <the decision, phrased as a stance — "X does Y (published design decision)">
+description: One sentence: what was decided and the dominant reason.
+tags: [<kebab-case>]
+status: stable
+stale_after: YYYY-MM-DD          # REQUIRED — a Decision cites pinned code
+generated: { by: <actor>, at: <ISO-8601> }
+code_refs:                       # REQUIRED on a Decision (§13.2)
+  - repo: <public URL or bare local slug>
+    commit: <full 40-hex sha>
+    path: <relative path, no leading slash>
+    lines: 120-142               # optional
+applies_to:                      # optional, recommended
+  - /concepts/<related-area>.md
+sources:
+  - id: <slug>
+    resource: <public URL or observation:YYYY-MM>
+    title: <source title>
+---
+
+[Self-contained summary, 2–5 sentences. A hurried agent stops here.]
+
+## Context        — the forces at play: constraints, options considered, why now
+
+## Decision       — what was chosen, phrased unambiguously
+
+## Consequences   — what becomes easier, what becomes harder, what we accepted
+
+## Open questions <!-- optional -->
+```
+
+### 6.7 Constraint (`concepts/`, engineering — §13)
+
+A hard limit that bounds the system — platform, standard, quota, correctness invariant.
+Distinct from a `Concept`: a boundary, not an idea.
+
+```markdown
+---
+type: Constraint
+title: <the constraint, phrased as a bound — "X must/never Y">
+description: One sentence: the bound and what it constrains.
+tags: [<kebab-case>]
+status: stable
+stale_after: YYYY-MM-DD          # required if the bound can move (quota, version…)
+generated: { by: <actor>, at: <ISO-8601> }
+applies_to:                      # optional, recommended
+  - /concepts/<area>.md
+code_refs:                       # optional — where the invariant lives in code/tests
+  - repo: <public URL or bare local slug>
+    commit: <full 40-hex sha>
+    path: <relative path>
+sources:
+  - id: <slug>
+    resource: <public URL or observation:YYYY-MM>
+    title: <source title>
+---
+
+[Self-contained summary: the bound, its source, and what it forbids. A hurried agent stops here.]
+
+## Details        — origin of the bound (spec, platform, measurement), exact scope,
+                  what it rules out — with inline citations[^<slug>]
+
+## Open questions <!-- optional -->
+```
+
 ## 7. Writing decision tree
 
 Run in order, on every urge to write:
@@ -351,7 +444,9 @@ and they share the same lint.**
 ### A. `ingest` — a source enters the wiki
 
 1. Convert the source to markdown → `bundles/<b>/raw/YYYY-MM-DD-<slug>.md` (header §6.3).
-   Large document: one file per chapter.
+   Large document: one file per chapter. A binary document (DOCX, PDF, EPUB…) goes
+   through the §13.5 pipeline — its raw header additionally records `source_file` and
+   `conversion`.
 2. Dedup: `rg -l "resource: <URL>" bundles/<b>/references/` — if a reference already
    exists, update it instead of creating.
 3. Create/update `references/<slug>.md` (§6.2): what the source says.
@@ -545,3 +640,198 @@ on this class of machine: measured at several minutes per query on CPU-only host
     synthesis from another synthesis (§6.5). **Silence means no**, as for a bundle.
 12. Commit a binary under `bundles/` — ingest it instead (§13.5) so the repository
     stays text-only.
+
+## 13. Engineering knowledge conventions
+
+This section adapts the wiki to **following a software project under complex system
+constraints**: heavy code, extensive system documentation (Word, PDF), software test
+processes. It is enabled by default; Annex A explains how to remove it for a purely
+generic knowledge wiki. Everything below rides on the general rules — the §7 tree, §2
+releasability, §8 operations and §12 prohibitions all apply unchanged to engineering
+knowledge.
+
+### 13.1 Additional page types
+
+- **`Decision`** — an architecture decision in the ADR sense (Nygard 2011): context,
+  choice, consequences. The most durable, least-findable knowledge in a project:
+  "why is it like this" is rarely written anywhere else. Template §6.6.
+- **`Constraint`** — a hard limit that bounds the system: platform limit, standard,
+  quota, correctness invariant, deployment boundary. Agents re-derive constraints
+  wrongly more often than anything else; writing them down is the point. Template §6.7.
+
+Deliberately **not** types: a *component* is a `Tool`/`Service`/`Concept` page tied
+to the rest with `applies_to`; an *interface* is a `Concept` with `code_refs` pointing
+at its definition file (a dedicated type would push toward duplicating signatures —
+the exact anti-pattern of §13.6); *test procedure* is a `Playbook`. Decision and
+Constraint pages live in `concepts/`; a bundle may declare a `decisions/`
+sub-directory (§4) at the cost of the computed signals, exactly like `playbooks/`.
+
+### 13.2 Additional frontmatter fields
+
+**`code_refs`** — references to code (list; **required on `type: Decision`**,
+optional elsewhere):
+
+```yaml
+code_refs:
+  - repo: https://github.com/<org>/<repo>   # public canonical URL, OR a bare slug
+    commit: 4d1a0f2c9b8e7f6a5d4c3b2a1908171615141312   # FULL 40-hex sha — never a branch
+    path: src/raft.go                       # POSIX-relative, no leading slash
+    lines: 120-142                          # optional: "start-end" or "start"
+    note: leader append loop                # optional, one clause
+```
+
+Rules: `repo` is a public URL or a **bare slug** for a local repository without a
+forge (the wiki and the code repositories are deliberately decoupled — see §13.6);
+`commit` is always the full sha because abbreviations become ambiguous over time;
+a page carrying `code_refs` **must** carry `stale_after` — a pinned commit IS a
+version, there is no separate version field (§13.6). The lint checks the sha shape,
+the path shape (`..` and leading slashes rejected), `lines` consistency, and the
+`stale_after` coupling; it does not (no network) check that the commit exists.
+
+**`applies_to`** — the system areas a piece of knowledge is about (list of
+bundle-relative paths, optional, recommended on Decision/Constraint):
+
+```yaml
+applies_to:
+  - /entities/raft-library.md
+  - /concepts/consensus-layer.md
+```
+
+Same path grammar as `covers`, different contract: `covers` declares a **derivation**
+(syntheses only, freshness-coupled, body-linked); `applies_to` is a plain "this is
+about that" link — the lint checks existence, nothing more. There is no `affects`
+field: it would be a duplicate.
+
+**`source_file` + `conversion`** — provenance of a document-ingested raw (inseparable
+pair; **required** on a raw produced from a binary document, **forbidden** on every
+other type):
+
+```yaml
+source_file:
+  name: system-spec-v3.docx        # basename of the original binary
+  sha256: 8f3a9c…                  # sha256 of the ORIGINAL binary — dedup key
+  stored_at: "storage:project-docs"  # public URL, or a non-identifying storage slug
+  size_bytes: 348512               # optional
+conversion:
+  tool: "pandoc 3.1"               # converter + version
+  date: 2026-10-13
+```
+
+`source_file.sha256` hashes the **binary** — the document-level dedup key (§6.3);
+`content_sha256` keeps hashing the **converted body**. Both are required on a
+document raw. Two raws in the same bundle carrying the same `source_file.sha256` is
+a lint error (re-ingestion).
+
+### 13.3 What the wiki never captures (engineering edition)
+
+| Does not go here | Where it lives | What the wiki keeps |
+|---|---|---|
+| Test campaign results (runs, coverage per run, flakiness per run, benchmarks per run) | the CI / capture system | the durable reading: a threshold as a `Constraint`, a failure lesson, a reproduction `Playbook` |
+| The production code itself | its own repository | the reference: pinned `code_refs` |
+| Transient bugs | the tracker | a recurring pattern → `Concept`/lesson page; otherwise nothing |
+| Runtime logs and metrics | the system's telemetry | the invariants and thresholds they reveal |
+
+### 13.4 Test knowledge — what goes where
+
+| The knowledge is… | It goes to… |
+|---|---|
+| *How* to run/verify a test, reproduce an environment, a flaky condition | `Playbook` |
+| What the system must impose on itself (threshold, invariant, supported matrix) | `Constraint` |
+| Why a testing choice was made (strategy, harness, fixtures design) | `Decision` |
+| A lesson from a failure (blind spot of a test, trap of an environment) | a *Failure lessons* section on the page concerned — never a new type |
+
+Campaign **results** stay out entirely (§13.3): a result is an action-system state,
+not knowledge — the filter of §7.1 rejects it (not durable past the next run).
+
+### 13.5 Ingesting binary documents (DOCX, PDF, EPUB…)
+
+1. **Hash before anything**: `sha256sum <file>` — compare against existing
+   `source_file.sha256` (§6.3). Identical → stop (at most refresh the reference's
+   `last_modified`); different → proceed to a new dated raw.
+2. **Convert**: `.docx` → `pandoc -f docx -t gfm --wrap=none`; `.pdf` →
+   `pdftotext -layout -enc UTF-8`. The body lands **unretouched** — the conversion
+   is declared in `conversion.tool`, honesty lives in the header. `tools/ingest-doc.sh`
+   automates steps 1–5.
+3. **Split large documents** chapter by chapter (cut on level-1 headings): one dated
+   raw per chapter, each carrying the same `source_file` block, its own
+   `content_sha256` and a chapter slug.
+4. **Assemble** the raw header §6.3 (with `source_file`/`conversion`), then run the
+   usual §8.A continuation: reference digest, knowledge pages, links, log, commit.
+5. The binary itself **stays out of the repository** — its location is `stored_at`.
+   git-lfs remains an owner-decided exception (§4).
+
+### 13.6 Citing code — reference, never duplicate
+
+1. The wiki **never duplicates production code**. It references (repo, commit, path,
+   lines) and captures what the code cannot say about itself: why, trade-offs,
+   traps, non-obvious invariants.
+2. The wiki and the code repositories are **decoupled**: the code usually lives in a
+   local repository, most often without a forge. The durable identifier is the
+   full commit sha — resolvable with local git (`git -C <path> show <sha>:<path>`)
+   for as long as the repository lives. No forge is required.
+3. Snippets in page bodies are **pedagogical examples**: short, generic, explicitly
+   illustrative, subject to §2 — never copies of production code.
+4. **Never fabricate a `code_ref`** — a sha you have not seen does not get written
+   (same standard as URLs: a fabricated reference poisons the corpus).
+5. Re-pointing a `code_ref` (new sha) **is** a re-verification: the update touches
+   both the ref and the page body, and resets `stale_after`.
+6. Drift tracking: when the code moves, re-verify from the pinned sha with local git
+   (`git log <path> <sha>..`), never by re-reading everything.
+
+### 13.7 Mapping a large codebase (methodology)
+
+Agents routinely fail at "ingesting a big repository" by trying to read it. The wiki
+**never ingests a repository**: it does not map the code (an architecture dump rots
+with the next commit, and the repository already carries it) — it captures the
+non-obvious. Tiers, in order:
+
+1. **Orient without reading**: README and docs first; `git ls-tree -r --name-only`
+   (paginated) for the shape; `git tag` for versions; file churn —
+   `git log --format= --name-only | sort | uniq -c | sort -rn | head` — the
+   most-touched files concentrate the pain, and the pain concentrates the knowledge.
+2. **Read the history, not the code**: `git log` of the hot zones; `git log -S
+   "<symbol>"` to find when an invariant appeared. The git history is a primary
+   source of the `observation:` kind.
+3. **Tests as specification**: each non-obvious invariant a test encodes is a
+   `Constraint` candidate.
+4. **Extract through the §7 filter**: most of the code yields NOTHING (trivial, or
+   findable in 10 s in the repository — the repository is the source of record).
+5. **Pin while reading**: every `code_refs` entry is written with the current sha
+   plus `stale_after`.
+
+Coverage is **bottom-up by default** — from the pains, fixes and decisions actually
+encountered. A top-down architectural view only ever arrives as a synthesis, under
+the §6.5 regime (≥ 5 pages, owner-approved), never as a first move. Named
+anti-patterns: dumping the directory tree into a page; ingesting the changelog;
+"reading everything first".
+
+### 13.8 Attacking a large document base (methodology)
+
+Never ingest a document fund wholesale. Order of operations:
+
+1. **Inventory first**: titles, dates, versions, and the sha256 of every binary —
+   a table of `source_file` hashes before any conversion.
+2. **Filter per chapter, not per document** (§7 tree): in a system document,
+   requirements → `Constraint` candidates; recorded decisions → `Decision`;
+   environment descriptions → `Constraint`; procedures → `Playbook`. Most chapters
+   yield nothing.
+3. **Prioritize by pain**: the most-cited, most-requested documents first.
+4. Convert one chapter-excerpt first, get the owner's read on the result, **then**
+   run the series (§13.5 for the mechanics).
+
+## Annex A — Removing the engineering profile
+
+The profile is active as long as §13 is in the charter. Removing it (to get a purely
+generic knowledge wiki) is **one commit** that:
+
+1. deletes §13 and this annex;
+2. removes `code_refs`, `applies_to`, `source_file` and `conversion` from
+   `schemas/frontmatter-page.schema.json`, `templates/`, and the lint's engineering
+   checks — **in the same commit** (triple-lock rule, §5);
+3. removes `Decision` and `Constraint` from the `type` enum (same commit);
+4. keeps existing pages as-is: fields the lint no longer checks are simply ignored
+   (`additionalProperties: true`) — there is no forced migration;
+5. restores or leaves the demonstrative bundle at the owner's judgment.
+
+The header's audience line and the general rules (§2, §4's binaries-excluded rule,
+§12.12) survive the removal: they are general, not engineering-specific.

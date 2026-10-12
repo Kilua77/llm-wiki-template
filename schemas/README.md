@@ -20,8 +20,11 @@ frontmatter you are about to write:
 3. Remember what the schema **cannot** check — each field's `description` says so:
    `verified` never at creation, `covers` forbidden outside syntheses, no synthesis ever
    cited as a source, synthesis targets linked in the body, kebab-case tags, public URLs
-   only. `tools/lint.py` enforces all of these at commit time; the schema is the
-   pre-flight, the lint is the gate.
+   only, a page carrying `code_refs` must carry `stale_after`, `source_file`/`conversion`
+   reserved to document-ingested raws and always together, `applies_to` targets must
+   exist, no two raws of a bundle sharing one `source_file.sha256`. `tools/lint.py`
+   enforces all of these at commit time; the schema is the pre-flight, the lint is
+   the gate.
 
 ## Authority rule
 
