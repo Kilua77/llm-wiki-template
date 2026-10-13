@@ -56,6 +56,12 @@ not on a whiteboard.
 | D11 | **Attributed commits** — generic author + `Acting-Agent:` trailer; frontmatter = business provenance, commit = technical | "If someone breaks the wiki, their name is on it" — with actor conventions that stay publishable |
 | D12 | **Human navigation** — tree + hierarchical indexes, opens as an Obsidian vault | Answers the "flat dumps are unnavigable" critique |
 | D13 | **Publishability by default** — everything in a bundle is deemed publishable as-is; anonymization at writing; automated scan + private denylist outside the repository | Publishing must never require restructuring; the denylist stays out precisely because it is the one thing that must not leak |
+| D14 | **Declared audience** (template 2.0) — "releasable" targets the audience declared in the charter header (public by default, narrower allowed); secrets and personal data stay absolute at any audience | Professional deployments need the method without the public-by-default assumption — one parameter, zero new machinery |
+| D15 | **Engineering profile as charter §13, native** — Decision/Constraint types, `code_refs`/`applies_to`/`source_file`+`conversion` fields, code-mapping and document-base methodologies; removable as one commit (Annex A) | The contract stays single (D8); a profile directory would fragment authority, and grandfathering keeps removal migration-free |
+| D16 | **Two new types only** — no `Component` (a Tool/Service/Concept + `applies_to` covers it), no `Interface` (a Concept + `code_refs`; a type would push toward duplicating signatures), no `Test` (Playbook exists) | Every type is a routing decision an agent must make per page; minimal vocabularies route faster than complete ones |
+| D17 | **Binaries: hash + out-of-repo reference** — `source_file.sha256` as the document dedup key, conversion declared, git-lfs an owner exception; documents split per chapter, same-date sharing tolerated by the lint | Keeps the repository text-only (D4) without losing provenance; the binary lives where the project already keeps it |
+| D18 | **The pinned commit IS the version** — full 40-hex sha in `code_refs`, `stale_after` mandatory alongside; no version field | A second version field would drift from the sha; the coupling makes re-verification automatic through the freshness loop |
+| D19 | **Codebases and document funds are attacked by methodology, not ingestion** — orient → read history → mine tests → filter → pin (§13.7); inventory → per-chapter filter → prioritize by pain (§13.8) | Agents fail at "read everything"; the wiki captures the non-obvious, the repository remains the source of record |
 
 Two decisions that cut across everything: **`merge=union` on `log.md`** (`.gitattributes`)
 makes concurrent append by parallel agents safe by construction, and the commit lock
@@ -123,26 +129,36 @@ Every threshold, with where it lives:
 
 | Threshold | Default | Where |
 |---|---|---|
-| Pages per bundle before search tier-up | ~100 | charter §11 |
+| Pages per bundle before search tier-up | ~100 | charter §11, `PAGES_PER_BUNDLE_THRESHOLD` in `metrics.py` (env `WIKI_PAGES_THRESHOLD`) |
 | Bundle creation potential | ≥ ~10 pages | charter §10 |
+| Bundle split flag | ≥ threshold, two weeks running | charter §10.6, `metrics.py` |
 | Synthesis theme threshold | ≥ 5 pages | charter §6.5, `SYNTH_THEME_MIN` in `lint.py` |
 | Synthesis adrift warning | ≥ 3 uncovered pages | `SYNTH_COVERAGE_WARN` in `lint.py` |
 | Tag "too broad to be a theme" | 60% of a bundle's pages | `SYNTH_TAG_TOO_BROAD` in `lint.py` |
 | Freshness lag | > 90 days behind freshest source | `FRESHNESS_LAG_DAYS` in `lint.py` |
 | Long-page split candidate | > 200 lines | `LONG_PAGE_LINES` in `lint.py` |
 | Dormant draft | > 30 days | charter §8.F |
+| Contested escalation | > 60 days | charter §8.F, `CONTESTED_ESCALATE_DAYS` in `metrics.py` |
+| Document auto chapter-split | > 1500 lines | `CHAPTER_SPLIT_LINES` in `ingest-doc.sh` |
 | Durability test | true in 6 months | charter §7.1 |
 | Default language | English (per-topic exceptions) | charter §1 |
+| Declared audience | public | charter header, §2 |
 | Denylist location | `~/.config/wiki-lint/denylist.txt` or `$WIKI_DENYLIST` | `lint.py` |
 
 ## 8. Evolving the charter — and porting upstream changes
 
 - Charter changes happen **in the charter first**, in a dedicated commit, and are
-  always reported to the owner. When §5 (frontmatter) changes, `schemas/` and
-  `templates/` change **in the same commit**.
-- This template was derived from a production charter (v2.1). If you derived your
-  wiki from this template, upstream improvements flow the same way: read the
-  upstream diff, port section by section, and let your own inventory and thresholds
-  decide what applies. Your charter is yours once you have personalized it — keep a
-  note of the lineage (template version in the header) so future-you knows what
+  always reported to the owner. When §5 (frontmatter) changes, `schemas/`,
+  `templates/` and the lint's checks change **in the same commit** (the
+  triple-lock rule — a schema that drifts from the lint is worse than none).
+- This template is version **2.0**, derived from production charter v2.1 and
+  template 1.0. The 2.0 additions: declared audience (D14), the engineering
+  profile §13 with its two types and four fields (D15–D17), bundle-split and
+  contested-resolution procedures, `tools/metrics.py`, `tools/ingest-doc.sh`,
+  the versioned test suite, and the documentation set (ARCHITECTURE,
+  IMPLEMENTATION-GUIDE, the MCP guide). If you derived your wiki from an
+  earlier version, upstream improvements flow the same way: read the diff,
+  port section by section, and let your own inventory and thresholds decide
+  what applies. Your charter is yours once you have personalized it — keep the
+  lineage note (template version in the header) so future-you knows what
   "upstream" means.

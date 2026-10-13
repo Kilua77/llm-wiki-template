@@ -135,16 +135,16 @@ routes against the bundle inventory.
    plainly.
 ```
 
-## 6. A wiki MCP server (future draft)
+## 6. A wiki MCP server — optional access layer
 
-A read-mostly MCP server in front of the repository — semantic `search`, `read_page`
-(via `git show origin/main:` for freshness without touching the working tree),
-`propose_edit` (throwaway worktree → lint → branch + PR) — so that hosted assistants
-get purposeful tools instead of raw file-by-file git access. The write channel does
-not change (branch + PR), so the ruleset, CI and automerge apply unmodified. Not
-shipped with this template; the design travels well (any git repository, an outbound
-tunnel, an OAuth delegation to the forge) but the configuration is per-instance
-(domain, app credentials, owner allowlist).
+A read-mostly MCP server in front of the repository, for hosted assistants that
+should read the wiki and propose edits token-efficiently. **Optional** — the
+local-only path is complete without it, and in the nominal setup (local agent,
+local code, often no forge) it is simply not needed. The complete implementation
+guide — tool contracts, outbound-only tunnel, OAuth delegation (RFC 9728), the
+paid-for pitfalls, and a build checklist with exit criteria — lives in
+**[guides/MCP-SERVER.md](guides/MCP-SERVER.md)**. No code ships with the template:
+the configuration is per-instance by design.
 
 ## 7. Beyond
 
