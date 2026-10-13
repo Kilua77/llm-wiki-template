@@ -1,13 +1,18 @@
 # Canary — the voluntary leak test of docs/SETUP.md (path B8), automated:
 # one scratch page carrying every probe, and EVERY one of them must produce
 # its own error line. A gate never seen closing is not a gate.
+# Self-contained: it builds its own scratch bundle, so it runs on the
+# template AND on an initialized wiki (where the demo bundle is gone).
 . "$(dirname "$0")/../lib.sh"
 
 sb=$(new_sandbox)
 deny="$TESTS_TMP/canary-denylist.txt"
 printf 'zephyr-project\n' > "$deny"
 
-probe="$sb/bundles/example/concepts/canary.md"
+mkdir -p "$sb/bundles/_canary/concepts"
+printf '# Log\n' > "$sb/bundles/_canary/log.md"
+regen "$sb"
+probe="$sb/bundles/_canary/concepts/probe.md"
 cat > "$probe" <<'EOF'
 ---
 type: Concept
