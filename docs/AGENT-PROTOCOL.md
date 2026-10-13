@@ -9,6 +9,41 @@ never contradicts it. Frontmatter shapes: [../schemas/](../schemas/) (validate) 
 [../templates/](../templates/) (copy). When this protocol and the charter appear to
 disagree, the charter wins and this document must be fixed.
 
+## 0. Guidance posture — teach, propose, defer
+
+You are the user's guide into this system, especially while the wiki is young
+(freshly initialized, few bundles, few pages). **Teach while operating**:
+
+- **One rule at a time, at the moment it matters.** When the user meets a
+  concept for the first time — bundle, the 3+1 filter, statuses, synthesis —
+  explain it in one plain sentence with its charter §, instead of jargon or a
+  wall of contract. The full contract exists; your job is to spare them
+  reading it.
+- **Route the user's intent** to the right method before doing anything:
+
+| The user says… | The right method (say so, then do it) |
+|---|---|
+| "I have a question" / asks something factual | wiki-first read (§1) — answer citing wiki paths |
+| "Here is a page / article / link to add" | `ingest` (§4) — raw + reference + page updates |
+| "Here is a spec / design doc (Word, PDF)" | document ingestion (§4, CHARTE §13.5) — `tools/ingest-doc.sh`, then the §13.4 reading grid |
+| "Here is our codebase / repo" | never ingest it — map it (§4bis, CHARTE §13.7): orient, read history, mine tests, filter, pin |
+| "We need a wiki about X" (new subject) | bundle proposal (§3, CHARTE §10) — you draft it, the owner says yes or no |
+| "Give me an overview of theme X" | synthesis regime (CHARTE §6.5) — only if the theme is ripe; never spontaneously |
+
+- **Frame the first times.** Before the first bundle, the first document
+  ingestion, the first codebase mapping, the first split: propose a short
+  **plan** — where to start, how many pages to expect, what deliberately
+  stays out — and show **one example before running the series**. A user who
+  sees one honest Decision page understands the contract better than by
+  reading §13.
+- **Propose and explain, never decide for the user.** The governance is
+  unchanged: you draft proposals in user language (not contract jargon), the
+  owner disposes, and silence means no. When you park something in the
+  closest bundle, say so in plain words — that is a `routing_review`, and the
+  user should know their wiki carries that marker.
+
+The posture in three words: **teach, propose, defer.**
+
 ## 1. Reading — wiki-first
 
 Before answering any knowledge question, search the wiki first:
@@ -126,6 +161,66 @@ Do not merge everything into one existing page (it dilutes the concept); do not
 create orphan pages either — weaving links is part of the same flow. Large documents:
 one raw file per chapter. Book-scale distillation: keep digests `status: draft` until
 the whole book is read — honesty about what was actually read beats optimism.
+
+### Binary documents (Word, PDF — CHARTE §13.5)
+
+Never commit a binary. Route it through the pipeline:
+
+```bash
+sha256sum spec.docx                      # dedup key — check before converting
+tools/ingest-doc.sh <bundle> spec.docx \
+  --stored-at "storage:project-docs"     # where the binary actually lives
+```
+
+The tool converts (pandoc / pdftotext `-enc UTF-8`), splits chapters, assembles
+the header (`source_file` + `conversion` + `content_sha256`), regenerates indexes
+and lints — **it does not commit**: the four-file continuation above is still
+yours. No converter installed? Convert by any means, declare it honestly in
+`conversion.tool`, and pass `--from-converted <body.md>`.
+
+Reading grid for a system document (CHARTE §13.4): requirements → `Constraint`,
+recorded decisions → `Decision`, environment descriptions → `Constraint`,
+procedures → `Playbook`. Most chapters yield nothing — filter per chapter, not
+per document, and never ingest a document fund wholesale: inventory first
+(titles, dates, hashes), prioritize by pain, convert one chapter excerpt and
+have the owner read it before running the series.
+
+## 4bis. Engineering material — code and tests
+
+**Citing code** (CHARTE §13.6): the wiki never duplicates production code —
+it references `{repo, commit, path, lines}` and captures the non-obvious
+(why, trade-offs, traps). The full 40-hex sha only (never a branch), pinned
+from something you actually saw (`git -C <repo> show <sha>:<path>`), with
+`stale_after` on the page — a pinned commit IS a version. Snippets in bodies
+are pedagogical examples, never production copies. Wiki and code repositories
+are decoupled: a bare local slug is a valid `repo`.
+
+**Mapping a large codebase** (CHARTE §13.7) — agents fail at this by trying
+to read everything. In order, with local git:
+
+```bash
+# 1. Orient without reading
+git -C <repo> ls-files | head -50                 # shape (or ls-tree -r --name-only, paginated)
+git -C <repo> tag | tail -5                       # versions
+git -C <repo> log --format= --name-only | sort | uniq -c | sort -rn | head   # churn = pain = knowledge
+# 2. Read the history, not the code
+git -C <repo> log --oneline -20 -- <hot-path>     # what kept breaking/evolving
+git -C <repo> log -S "<symbol>" --oneline          # when an invariant appeared
+# 3. Tests as specification — each non-obvious invariant a test encodes → Constraint candidate
+# 4. Extract through the §2 filter — most code yields NOTHING
+# 5. Pin while reading — code_refs at the sha you are on, stale_after set
+```
+
+Coverage is **bottom-up**: start from the pains, fixes and decisions actually
+encountered. A top-down architecture view only ever arrives as a synthesis
+(§6.5 regime). Anti-patterns, named: dumping the directory tree into a page;
+ingesting the changelog; "reading everything first".
+
+**Test knowledge** (CHARTE §13.4): *how* to test/reproduce → `Playbook`;
+what the system must impose on itself → `Constraint`; why a testing choice →
+`Decision`; a failure lesson → a *Failure lessons* section on the page
+concerned. Campaign **results** stay in the CI — a result is an action-system
+state, not knowledge (§2 filter rejects it).
 
 ## 5. The six operations
 

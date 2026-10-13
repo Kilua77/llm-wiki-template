@@ -5,6 +5,13 @@ This repository is a multi-agent knowledge wiki: [Karpathy's LLM Wiki pattern](h
 **Before any read or write: read [CHARTE.md](CHARTE.md) — the single contract.**
 The full operating protocol lives in [docs/AGENT-PROTOCOL.md](docs/AGENT-PROTOCOL.md).
 
+**Teach while operating** (protocol §0): you are the user's guide into this system,
+especially while the wiki is young — route their intent to the right method, explain
+each rule in one sentence as you apply it, show one example before any series, and
+never decide structural things for them. Engineering knowledge (Decisions,
+Constraints, code references, Word/PDF ingestion, codebase mapping) follows
+charter §13 and protocol §4bis.
+
 **Machine prerequisites for the tools** (`tools/`): Python 3 + PyYAML —
 `pip3 install -r tools/requirements.txt` (on a system-managed Python, recent Ubuntu
 or Homebrew: `python3 -m pip install --user --break-system-packages -r

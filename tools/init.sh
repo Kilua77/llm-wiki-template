@@ -134,17 +134,31 @@ fi
 
 cat <<'NEXT'
 
-Initialized. Next steps:
+Initialized — your wiki is live, and your agents are built to guide you.
 
-  1. Read docs/SETUP.md — path A (local only) or path B (full remote setup:
-     deploy key, ruleset, optional automerge and GitHub App).
-  2. Recommended — create your private denylist, the one publishability check
-     that cannot live in the repository:
+Your first session: point an agent at AGENTS.md and tell it what you want —
+
+  - "answer this question"        → it searches the wiki first, cites paths
+  - "add this page/article"       → it ingests (raw + reference + pages)
+  - "ingest this spec (Word/PDF)" → tools/ingest-doc.sh, then it proposes
+                                    Constraints/Decisions/Playbooks from it
+  - "map our codebase"            → it orients by history and churn, mines the
+                                    tests, and extracts only the non-obvious
+  - "start a wiki about X"        → it drafts a bundle proposal; you approve
+
+It explains each rule as it applies it (one sentence, with its charter §),
+shows one example before running any series, and never decides structural
+things for you — silence means no.
+
+Behind the scenes, when you want depth:
+
+  1. docs/IMPLEMENTATION-GUIDE.md — the phased build manual (you are past
+     phase 1; gates, remote+CI, weekly loop and the rest follow it)
+  2. Your private denylist — the one releasability check that cannot live in
+     the repository:
        mkdir -p ~/.config/wiki-lint && ${EDITOR:-vi} ~/.config/wiki-lint/denylist.txt
      One lowercase term per line, # comments allowed. Never commit it.
      (A different location can be exported as WIKI_DENYLIST.)
-  3. Point your agents at this repository: CHARTE.md is the contract,
-     AGENTS.md the on-ramp, docs/AGENT-PROTOCOL.md the operating protocol.
-  4. Your first bundle: an agent files a proposal (§10), you say yes, then
-     tools/new-bundle.sh <name> creates it.
+  3. bash tests/run-tests.sh — prove the whole toolchain, any time
+  4. docs/ARCHITECTURE.md — the assembled system in one picture
 NEXT
