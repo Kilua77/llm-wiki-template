@@ -90,7 +90,7 @@ if command -v pandoc >/dev/null 2>&1; then
   (cd "$sb4" && bash tools/ingest-doc.sh example "$TESTS_TMP/docs/real.docx" --stored-at "https://example.org/real.docx" >/dev/null 2>&1)
   n=$(ls "$sb4/bundles/example/raw/"*.md 2>/dev/null | wc -l)
   if [ "$n" -ge 1 ]; then ok "real docx conversion produced a raw"; else fail "real docx conversion failed"; fi
-  file_has "$(ls "$sb4/bundles/example/raw/"*.md | head -1)" "stored_at: \"https://example.org/real.docx\"" "…with the explicit stored_at"
+  file_has "$(ls "$sb4/bundles/example/raw/"2026-10-13-*.md | head -1)" "stored_at: \"https://example.org/real.docx\"" "…with the explicit stored_at"
 else
   echo "  SKIP: pandoc not installed — real docx path covered in CI"
 fi
