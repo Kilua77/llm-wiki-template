@@ -93,7 +93,7 @@ The FLC architecture provides a **Platform Abstraction Layer (PAL)** that:
 
 - [FLC Overview](/concepts/flc-overview.md) — High-level architecture
 - [Embedded Limits](/constraints/embedded-limits.md) — Platform constraints
-- [Wind River LTS](/constraints/windriver-lts.md) — OS constraints
+- [Wind River Linux LTS Versions](/constraints/windriver-lts-versions.md) — OS version constraints
 
 ## Sources
 
