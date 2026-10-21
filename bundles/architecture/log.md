@@ -17,3 +17,4 @@
 * **Split**: windriver-lts.md split into windriver-lts-versions.md and windriver-lts-operations.md due to size (>200 lines). (hermes/mistral-medium)
 * **Update**: Links updated to reference new split pages. (hermes/mistral-medium)
 * **Commit**: Sources ingested and pages finalized via `tools/commit.sh` — 15 files, 1566 insertions. (hermes/mistral-medium)
+* **Update**: ASCII diagrams converted to Mermaid format in flc-overview.md, components.md, databases.md — Compliance with ECMTCP plan requirement to use only Mermaid for all graphics. (opencode/mistral-medium)

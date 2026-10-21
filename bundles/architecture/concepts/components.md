@@ -52,31 +52,69 @@ The FLC architecture is composed of several **core components** that work togeth
 
 ## Component Relationships
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   External   │────▶│   APPSERV   │◀────│   External   │
-│   Systems    │     │             │     │   Systems    │
-└─────────────┘     └──────┬──────┘     └─────────────┘
-                          │
-                          ▼
-                    ┌─────────────┐
-                    │     SOL      │
-                    │             │
-                    └──────┬──────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-         ▼                 ▼                 ▼
-┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│     GOL      │   │    AVAIL    │   │   Databases  │
-│             │   │             │   │ (ADDR, MAIN) │
-└──────┬──────┘   └─────────────┘   └─────────────┘
-       │
-       ▼
-┌─────────────┐
-│  TL1AGENT    │
-│  SDNAGENT    │
-└─────────────┘
+```mermaid
+flowchart LR
+
+%% Components
+avail["AVAIL"]
+dbmgr["DB Manager"]
+golwdm["GOL"]
+solwdm["SOL"]
+sdnagent["SDN Agent"]
+tl1agent["TL1 Agent"]
+appserv["APPSERV"]
+
+%% Databases
+ADDR[("ADDR")]
+MAIN[("MAIN")]
+MAINPM[("MAIN PM")]
+SDNAGENT[("SDNAGENT")]
+TL1AGENT[("TL1AGENT")]
+
+subgraph Databases
+  ADDR
+  MAIN
+  MAINPM
+  SDNAGENT
+  TL1AGENT
+end
+
+subgraph Components
+  golwdm
+  solwdm
+  sdnagent
+  tl1agent
+  avail
+  dbmgr
+  appserv
+end
+
+%% Connections
+avail -.start (1)/monitor.-> dbmgr
+avail -.start (2)/monitor.-> golwdm
+avail -.start (3)/monitor.-> solwdm
+avail -.start (4)/monitor.-> tl1agent
+avail -.start (5)/monitor.-> sdnagent
+golwdm -.backup/restore.-> dbmgr
+golwdm <-.SLI.-> solwdm
+golwdm <-.GLI.-> sdnagent
+golwdm <-.GLI.-> tl1agent
+golwdm -.SQL conn.-> ADDR
+golwdm -.SQL conn.-> MAIN
+solwdm -.SQL conn.-> MAINPM
+sdnagent -.SQL conn.-> SDNAGENT
+tl1agent -.SQL conn.-> TL1AGENT
+ADDR <-.SQL conn.-> dbmgr
+MAIN <-.SQL conn.-> dbmgr
+MAINPM <-.SQL conn.-> dbmgr
+SDNAGENT <-.SQL conn.-> dbmgr
+TL1AGENT <-.SQL conn.-> dbmgr
+
+%% External connections
+appserv <-.requests.-> golwdm
+appserv <-.requests.-> solwdm
+appserv <-.requests.-> sdnagent
+appserv <-.requests.-> tl1agent
 ```
 
 ## See Also
