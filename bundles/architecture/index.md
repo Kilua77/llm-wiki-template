@@ -14,11 +14,12 @@ okf_version: "0.2"
 ## Constraints
 
 * [Embedded Platform Resource Limits](constraints/embedded-limits.md) - Hard constraints on resource usage for embedded platforms in ECMTCP.
-* [Wind River Linux LTS Constraints](constraints/windriver-lts.md) - Constraints and requirements for Wind River Linux LTS in ECMTCP.
+* [Wind River Linux LTS Operations and Security Constraints](constraints/windriver-lts-operations.md) - Security constraints, update policy, patch management, and monitoring for WRL LTS in ECMTCP.
+* [Wind River Linux LTS Versions and Platform Constraints](constraints/windriver-lts-versions.md) - Supported WRL LTS versions, kernel constraints, and toolchain requirements for ECMTCP platforms.
 
 ## Decisions
 
-*(empty)*
+* [Migration from ClearCase to Git](decisions/clearcase-to-git.md) - Decision to migrate ECMTCP versioning from ClearCase to Git, including rationale, process, and consequences.
 
 ## Entities
 

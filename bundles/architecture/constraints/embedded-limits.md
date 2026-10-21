@@ -169,7 +169,7 @@ The ECMTCP system runs on **resource-constrained embedded platforms** with stric
 ## See Also
 
 - [Platforms](/concepts/platforms.md) — Platform details
-- [Wind River LTS](/constraints/windriver-lts.md) — OS constraints
+- [Wind River Linux LTS Versions](/constraints/windriver-lts-versions.md) — OS version constraints
 - [FLC Overview](/concepts/flc-overview.md) — System architecture
 
 ## Sources
