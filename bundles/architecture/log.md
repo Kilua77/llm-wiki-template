@@ -7,3 +7,8 @@
 * **Update**: CHARTE.md updated with bundle inventory row. (hermes/mistral-medium)
 * **Update**: Proposal archived to `proposals/validated/2026-10-21-architecture.md`. (hermes/mistral-medium)
 * **Commit**: Initial bundle structure committed via `tools/commit.sh` — 26 files, 1479 insertions. (hermes/mistral-medium)
+* **Ingest**: [FLC Documentation Index](references/flc-intro-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/index.md, anonymized. (hermes/mistral-medium)
+* **Ingest**: [FLC Components Documentation](references/flc-components-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/flc_components.md, anonymized. (hermes/mistral-medium)
+* **Ingest**: [ECMTCP Acronyms List](references/acronyms-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/acronyms.md, anonymized. (hermes/mistral-medium)
+* **Ingest**: [Target Environment Documentation](references/target-env-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/target_environment.md, anonymized. (hermes/mistral-medium)
+* **Ingest**: [ClearCase to Git Migration Study](references/cc2git-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/cc2git.md, anonymized. (hermes/mistral-medium)
