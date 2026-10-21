@@ -29,33 +29,52 @@ FLC serves as the **central nervous system** for ECMTCP, orchestrating:
 
 ## High-Level Organization
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    FLC/ECMTCP System                           │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌───────────────────────┐ │
-│  │   Platform   │  │   Platform   │  │      Platform          │ │
-│  │  ESCT2000    │  │  EASE2000    │  │   ESCT3000/XFLC1000    │ │
-│  └──────┬──────┘  └──────┬──────┘  └───────────┬───────────┘ │
-│         │                 │                      │              │
-│         ▼                 ▼                      ▼              │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │                    FLC Core Layer                          │ │
-│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌───────────────────┐ │ │
-│  │  │   GOL   │ │   SOL   │ │  AVAIL  │ │      Other          │ │ │
-│  │  │         │ │         │ │         │ │     Components       │ │ │
-│  │  └─────────┘ └─────────┘ └─────────┘ └───────────────────┘ │ │
-│  └─────────────────────────────────────────────────────────┘ │
-│                         │ │ │                                  │
-│                         ▼ ▼ ▼                                  │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │                 Service & Data Layer                        │ │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │ │
-│  │  │   Databases  │  │    Agents    │  │   External Systems    │ │ │
-│  │  │ (ADDR, MAIN) │  │ (TL1, SDN)   │  │   (Network, SEPS)     │ │ │
-│  │  └─────────────┘  └─────────────┘  └─────────────────────┘ │ │
-│  └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    %% Platforms Layer
+    subgraph Platforms["Supported Platforms"]
+        ESCT2000["ESCT2000\n(PowerPC, Montavista)"]
+        EASE2000["EASE2000\n(Intel, RHEL 6.x)"]
+        ESCT3000["ESCT3000\n(ARMv7 Xilinx, WRL)"]
+        XFLC1000["XFLC1000/CFLC(Z)\n(ARM Xilinx, WRL 64-bit)"]
+    end
+    
+    %% FLC Core Layer
+    subgraph FLCCore["FLC Core Layer"]
+        GOL["GOL\nGeneric Object Layer"]
+        SOL["SOL\nSpecific Object Layer"]
+        AVAIL["AVAIL\nAvailability Manager"]
+        Other["Other Components"]
+    end
+    
+    %% Service & Data Layer
+    subgraph ServiceData["Service & Data Layer"]
+        DB["Databases\n(ADDR, MAIN, MAINPM)"]
+        Agents["Agents\n(TL1, SDN)"]
+        External["External Systems\n(Network, SEPS)"]
+    end
+    
+    %% Connections
+    ESCT2000 --> GOL
+    EASE2000 --> GOL
+    ESCT3000 --> GOL
+    XFLC1000 --> GOL
+    
+    GOL --> SOL
+    SOL --> AVAIL
+    AVAIL --> Other
+    
+    GOL --> DB
+    SOL --> DB
+    AVAIL --> Agents
+    Other --> Agents
+    
+    Agents --> External
+    DB --> External
+    
+    %% Styling
+    classDef deprecated fill:#f9f,stroke:#333;
+    class ESCT2000,EASE2000 deprecated;
 ```
 
 ## Key Characteristics

@@ -110,20 +110,31 @@ All databases use **embedded database engines** optimized for:
 - Minimal administrative overhead
 
 ### Data Organization
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        MAIN Database                           │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │ Configuration│  │   States     │  │    Audit Logs        │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-         │              │                    │
-         ▼              ▼                    ▼
-┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐
-│    ADDR      │  │   MAINPM     │  │   TL1AGENT/SDNAGENT  │
-│ (Addresses)  │  │ (Persistent) │  │   (Protocol-specific)│
-└─────────────┘  └─────────────┘  └─────────────────────┘
+
+```mermaid
+flowchart TD
+    %% MAIN Database Structure
+    subgraph MAIN["MAIN Database"]
+        Config["Configuration"]
+        States["States"]
+        Audit["Audit Logs"]
+    end
+    
+    %% Specialized Databases
+    ADDR[("ADDR\nAddresses")]
+    MAINPM[("MAINPM\nPersistent")]
+    PROTO[("TL1AGENT/SDNAGENT\nProtocol-specific")]
+    
+    %% Relationships
+    Config --> ADDR
+    States --> MAINPM
+    Audit --> PROTO
+    
+    %% Database Types
+    classDef relational fill:#e1f5fe,stroke:#0277bd;
+    classDef kv fill:#f3e5f5,stroke:#7b1fa2;
+    class Config,States,Audit,ADDR,PROTO relational;
+    class MAINPM kv;
 ```
 
 ## Performance Considerations
