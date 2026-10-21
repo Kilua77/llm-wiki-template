@@ -13,7 +13,6 @@ sources:
   - id: target-env
     resource: observation:2026-10
     title: Target Environment Documentation
-sources:
   - id: platform-specs
     resource: observation:2026-10
     title: Platform specification documents

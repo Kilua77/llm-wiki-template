@@ -1,5 +1,24 @@
 # Plan ECMTCP - Création des Bundles
 
+---
+
+## 📌 Consignes Globales (À RESPECTER ABSOLUMENT)
+
+1. **Diagrammes** : Utiliser **uniquement Mermaid** pour tous les graphiques (flowcharts, sequence diagrams, etc.).
+   - Exemple :
+     ```mermaid
+     flowchart TD
+       A[FLC] --> B[GOL]
+       A --> C[SOL]
+     ```
+   - **Interdit** : Images, SVG, ou autres formats.
+
+2. **Anonymisation** : Voir [CHARTE §2](../CHARTE.md#2-publishability-and-anonymization).
+
+3. **Frontmatter** : Toujours valider avec `python3 tools/lint.py` avant commit.
+
+---
+
 ## Ordre de création
 1. **architecture** → Fondation (composants, plateformes, acronymes)
 2. **components** → Détail des composants (GOL, SOL, AVAIL, etc.)
