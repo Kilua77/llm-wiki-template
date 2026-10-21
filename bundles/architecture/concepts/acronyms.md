@@ -5,11 +5,11 @@ description: Comprehensive list of acronyms and abbreviations used in the ECMTCP
 tags: [architecture, acronyms, terminology, ecmtcp, flc]
 status: draft
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 sources:
-  - id: observation
+  - id: acronyms
     resource: observation:2026-10
-    title: Direct observation of ECMTCP terminology
+    title: ECMTCP Acronyms List
 ---
 
 # ECMTCP/FLC Acronyms
@@ -92,3 +92,8 @@ grep -r "GOL" /path/to/codebase/
 - [FLC Overview](/concepts/flc-overview.md) — System architecture
 - [Components](/concepts/components.md) — Component details
 - [Platforms](/concepts/platforms.md) — Hardware platforms
+
+## Sources
+
+- [ECMTCP Acronyms List - Digest](../references/acronyms-digest.md)
+- [Raw: ECMTCP Acronyms List](../raw/2026-10-21-acronyms.md)

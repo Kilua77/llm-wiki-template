@@ -5,10 +5,14 @@ description: Hard constraints on resource usage for embedded platforms in ECMTCP
 tags: [architecture, constraints, embedded, limits, memory, storage]
 status: stable
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 applies_to:
   - /concepts/platforms.md
   - /entities/databases.md
+sources:
+  - id: target-env
+    resource: observation:2026-10
+    title: Target Environment Documentation
 sources:
   - id: platform-specs
     resource: observation:2026-10
@@ -167,3 +171,8 @@ The ECMTCP system runs on **resource-constrained embedded platforms** with stric
 - [Platforms](/concepts/platforms.md) — Platform details
 - [Wind River LTS](/constraints/windriver-lts.md) — OS constraints
 - [FLC Overview](/concepts/flc-overview.md) — System architecture
+
+## Sources
+
+- [Target Environment Documentation - Digest](../references/target-env-digest.md)
+- [Raw: Target Environment Documentation](../raw/2026-10-21-target-env.md)
