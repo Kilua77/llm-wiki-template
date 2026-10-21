@@ -34,3 +34,9 @@ Two write channels, one lint (CHARTE §8):
 - **Remote agent**, with only the git API: branch `agent/<actor>/<slug>` then a pull
   request — **never `main`**, never an `index.md` (CI regenerates them), and the
   `Acting-Agent:` trailer in the commit message.
+
+---
+
+## 📚 Plan ECMTCP
+> **Voir le plan détaillé** : [docs/plans/ecmtcp-bundles.md](docs/plans/ecmtcp-bundles.md)
+> **Rôle des agents** : Suivre strictement les propositions formalisées pour chaque bundle.
