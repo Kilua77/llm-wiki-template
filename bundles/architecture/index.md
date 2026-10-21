@@ -26,11 +26,19 @@ okf_version: "0.2"
 
 ## Raw
 
-*(empty)*
+* [ClearCase to Git Migration Documentation](raw/2026-10-21-cc2git.md) - Raw capture of ClearCase to Git migration study, ingested 2026-10-21. Immutable.
+* [ECMTCP Acronyms List](raw/2026-10-21-acronyms.md) - Raw capture of acronyms and abbreviations used in ECMTCP/FLC documentation, ingested 2026-10-21. Immutable.
+* [FLC Components Documentation](raw/2026-10-21-flc-components.md) - Raw capture of FLC components documentation, ingested 2026-10-21. Immutable.
+* [FLC Documentation Introduction](raw/2026-10-21-flc-intro.md) - Raw capture of FLC index documentation, ingested 2026-10-21. Immutable.
+* [Target Environment Documentation](raw/2026-10-21-target-env.md) - Raw capture of target environment documentation, ingested 2026-10-21. Immutable.
 
 ## References
 
-*(empty)*
+* [ClearCase to Git Migration Study Digest](references/cc2git-digest.md) - Summary of the ClearCase to Git migration feasibility study.
+* [ECMTCP Acronyms List Digest](references/acronyms-digest.md) - Summary of the acronyms and abbreviations used in ECMTCP/FLC documentation.
+* [FLC Components Documentation Digest](references/flc-components-digest.md) - Summary of the FLC components documentation.
+* [FLC Documentation Introduction Digest](references/flc-intro-digest.md) - Summary of the FLC documentation index page.
+* [Target Environment Documentation Digest](references/target-env-digest.md) - Summary of the target environment and startup documentation.
 
 ## Syntheses
 
