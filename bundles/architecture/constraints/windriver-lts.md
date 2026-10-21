@@ -5,10 +5,14 @@ description: Constraints and requirements for Wind River Linux LTS in ECMTCP.
 tags: [architecture, constraints, windriver, linux, lts, os]
 status: stable
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 applies_to:
   - /concepts/platforms.md
   - /constraints/embedded-limits.md
+sources:
+  - id: flc-components
+    resource: observation:2026-10
+    title: FLC Components Documentation
 sources:
   - id: windriver-docs
     resource: observation:2026-10
@@ -262,3 +266,10 @@ The following are **explicitly forbidden**:
 - [Platforms](/concepts/platforms.md) — Platform details
 - [Embedded Limits](/constraints/embedded-limits.md) — Resource constraints
 - [FLC Overview](/concepts/flc-overview.md) — System architecture
+
+## Sources
+
+- [FLC Components Documentation - Digest](../references/flc-components-digest.md)
+- [Raw: FLC Components Documentation](../raw/2026-10-21-flc-components.md)
+- [ClearCase to Git Migration - Digest](../references/cc2git-digest.md)
+- [Raw: ClearCase to Git Migration](../raw/2026-10-21-cc2git.md)

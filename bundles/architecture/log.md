@@ -12,3 +12,5 @@
 * **Ingest**: [ECMTCP Acronyms List](references/acronyms-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/acronyms.md, anonymized. (hermes/mistral-medium)
 * **Ingest**: [Target Environment Documentation](references/target-env-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/target_environment.md, anonymized. (hermes/mistral-medium)
 * **Ingest**: [ClearCase to Git Migration Study](references/cc2git-digest.md) — Raw source from /local/ECMTCP_MEL/mkdocsFLC/docs/cc2git.md, anonymized. (hermes/mistral-medium)
+* **Update**: Pages updated with source references — flc-overview.md, components.md, platforms.md, acronyms.md, databases.md, embedded-limits.md, windriver-lts.md. (hermes/mistral-medium)
+* **Commit**: Sources ingested via `tools/commit.sh` — 15 files, 1566 insertions. (hermes/mistral-medium)

@@ -5,11 +5,14 @@ description: Global architecture of the FLC/ECMTCP system, its purpose, and high
 tags: [architecture, flc, ecmtcp, system-overview]
 status: draft
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 sources:
-  - id: observation
+  - id: flc-intro
     resource: observation:2026-10
-    title: Direct observation of ECMTCP architecture
+    title: FLC Documentation Index
+  - id: flc-components
+    resource: observation:2026-10
+    title: FLC Components Documentation
 ---
 
 # FLC/ECMTCP Overview
@@ -68,3 +71,10 @@ FLC serves as the **central nervous system** for ECMTCP, orchestrating:
 - [Platforms](/concepts/platforms.md) — Supported hardware platforms
 - [Databases](/entities/databases.md) — Data storage entities
 - [Acronyms](/concepts/acronyms.md) — ECMTCP/FLC terminology reference
+
+## Sources
+
+- [FLC Documentation Index - Digest](../references/flc-intro-digest.md)
+- [FLC Components Documentation - Digest](../references/flc-components-digest.md)
+- [Raw: FLC Documentation Index](../raw/2026-10-21-flc-intro.md)
+- [Raw: FLC Components Documentation](../raw/2026-10-21-flc-components.md)

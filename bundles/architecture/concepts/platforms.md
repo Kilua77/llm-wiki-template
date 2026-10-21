@@ -5,11 +5,11 @@ description: Hardware platforms supported by the ECMTCP system and their charact
 tags: [architecture, platforms, hardware, ecmtcp]
 status: draft
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 sources:
-  - id: observation
+  - id: target-env
     resource: observation:2026-10
-    title: Direct observation of ECMTCP platforms
+    title: Target Environment Documentation
 ---
 
 # Supported Platforms
@@ -94,3 +94,8 @@ The FLC architecture provides a **Platform Abstraction Layer (PAL)** that:
 - [FLC Overview](/concepts/flc-overview.md) — High-level architecture
 - [Embedded Limits](/constraints/embedded-limits.md) — Platform constraints
 - [Wind River LTS](/constraints/windriver-lts.md) — OS constraints
+
+## Sources
+
+- [Target Environment Documentation - Digest](../references/target-env-digest.md)
+- [Raw: Target Environment Documentation](../raw/2026-10-21-target-env.md)

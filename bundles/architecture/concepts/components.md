@@ -5,11 +5,11 @@ description: Overview of the main components within the FLC/ECMTCP architecture.
 tags: [architecture, components, flc, ecmtcp]
 status: draft
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 sources:
-  - id: observation
+  - id: flc-components
     resource: observation:2026-10
-    title: Direct observation of ECMTCP components
+    title: FLC Components Documentation
 ---
 
 # FLC Components
@@ -85,3 +85,8 @@ The FLC architecture is composed of several **core components** that work togeth
 - [Platforms](/concepts/platforms.md) — Hardware platforms
 - [Databases](/entities/databases.md) — Data storage
 - [Acronyms](/concepts/acronyms.md) — Component acronyms and terminology
+
+## Sources
+
+- [FLC Components Documentation - Digest](../references/flc-components-digest.md)
+- [Raw: FLC Components Documentation](../raw/2026-10-21-flc-components.md)

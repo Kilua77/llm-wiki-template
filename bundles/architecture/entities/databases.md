@@ -5,11 +5,11 @@ description: Overview of database entities within the ECMTCP system and their ro
 tags: [architecture, databases, entities, data-storage, ecmtcp]
 status: draft
 stale_after: 2027-10-21
-generated: { by: hermes/mistral-medium, at: 2026-10-21T15:30:00Z }
+generated: { by: hermes/mistral-medium, at: 2026-10-21T17:30:00Z }
 sources:
-  - id: observation
+  - id: flc-components
     resource: observation:2026-10
-    title: Direct observation of ECMTCP databases
+    title: FLC Components Documentation
 ---
 
 # ECMTCP Databases
@@ -155,3 +155,8 @@ See [Embedded Limits](/constraints/embedded-limits.md) for:
 - [FLC Overview](/concepts/flc-overview.md) — System architecture
 - [Components](/concepts/components.md) — Component details
 - [Embedded Limits](/constraints/embedded-limits.md) — Platform constraints
+
+## Sources
+
+- [FLC Components Documentation - Digest](../references/flc-components-digest.md)
+- [Raw: FLC Components Documentation](../raw/2026-10-21-flc-components.md)
