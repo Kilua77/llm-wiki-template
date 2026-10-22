@@ -37,6 +37,10 @@ Two write channels, one lint (CHARTE §8):
 
 ---
 
-## 📚 Plan ECMTCP
-> **Voir le plan détaillé** : [docs/plans/ecmtcp-bundles.md](docs/plans/ecmtcp-bundles.md)
+## 📚 Plans ECMTCP
+> **Plans détaillés par bundle** :
+> - [Bundle Architecture](docs/plans/01-architecture.md) — Architecture globale, composants, plateformes, acronymes
+> - [Bundle Components](docs/plans/02-components.md) — Composants individuels, interfaces, bases de données
+> - *À venir* : development, best-practices, testing, infrastructure, meetings
+> 
 > **Rôle des agents** : Suivre strictement les propositions formalisées pour chaque bundle.
