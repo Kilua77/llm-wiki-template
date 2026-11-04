@@ -94,6 +94,8 @@ added here only after explicit owner validation (§10).
 |---|---|---|---|
 | `example` | The LLM wiki pattern itself and the §13 engineering conventions — a demonstrative bundle exercising every directory type (concept, entity, reference, raw with content_sha256, log with Query-miss) and every engineering field (Decision and Constraint pages with pinned code_refs, a real document ingestion with source_file/conversion) | Any real knowledge — this bundle is a live format demo with small public-source examples, removed by `tools/init.sh`; your first real bundle comes from a §10 proposal | Demonstrative (removed at init) |
 | `architecture` | Architecture globale FLC/ECMTCP, composants, plateformes, acronymes et décisions | Détails d'implémentation des composants (→ bundle components), Outils de build (Albie, wpack) (→ bundle development), Stratégies de test (→ bundle testing) | Active (validated 2026-10-21) |
+| `development` | Outils de build (Albie, wpack), processus de compilation et environnement de développement | Architecture globale, runtime des composants, stratégies de test | Active (validated 2026-11-04) |
+| `testing` | Stratégies de test, frameworks et bonnes pratiques ECMTCP | Architecture globale, détails composants, outils de build | Active (validated 2026-11-04) |
 <!-- inventory:end -->
 
 ## 4. Layout and naming
