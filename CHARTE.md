@@ -96,6 +96,7 @@ added here only after explicit owner validation (§10).
 | `architecture` | Architecture globale FLC/ECMTCP, composants, plateformes, acronymes et décisions | Détails d'implémentation des composants (→ bundle components), Outils de build (Albie, wpack) (→ bundle development), Stratégies de test (→ bundle testing) | Active (validated 2026-10-21) |
 | `development` | Outils de build (Albie, wpack), processus de compilation et environnement de développement | Architecture globale, runtime des composants, stratégies de test | Active (validated 2026-11-04) |
 | `testing` | Stratégies de test, frameworks et bonnes pratiques ECMTCP | Architecture globale, détails composants, outils de build | Active (validated 2026-11-04) |
+| `components` | Composants ECMTCP individuels (GOL, SOL, AVAIL) et leurs interfaces | Architecture globale, outils de build, stratégies de test | Active (validated 2026-11-04) |
 <!-- inventory:end -->
 
 ## 4. Layout and naming
