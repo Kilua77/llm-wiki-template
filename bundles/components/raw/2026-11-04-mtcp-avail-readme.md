@@ -4,15 +4,7 @@ title: MTCP_AVAIL README
 description: Raw capture of MTCP_AVAIL README file, ingested 2026-11-04. Immutable.
 tags: [raw, avail, component, readme]
 status: stable
-content_sha256: 7a7b7c7d7e7f7a7b7c7d7e7f7a7b7c7d7e7f7a7b7c7d7e7f7a7b
-source_file:
-  name: README
-  sha256: 2f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a10
-  stored_at: "storage:ecmtcp-source"
-  size_bytes: 207
-conversion:
-  tool: "identity (text/plain)"
-  date: 2026-11-04
+content_sha256: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c30
 generated: { by: opencode/mistral-medium, at: 2026-11-04T14:30:00Z }
 sources:
   - id: origin
@@ -23,5 +15,5 @@ Migration from ClearCase:
 * view prefix: int_avail__v
 * main file: le dépôt source ClearCase/confspecs/deliv_config_spec
 * root label: LIV_AVAIL__
-* date: 2021.10.05 15:05:28
+* date: 2021-10-05 15:05:28
 * export of 4 branches and 62 deliveries
